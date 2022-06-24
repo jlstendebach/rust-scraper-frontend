@@ -6,6 +6,12 @@ class App {
     interval = null; 
 
     constructor() {
+        document
+            .getElementById("online-only-checkbox")
+            .addEventListener(
+                "change", 
+                this.onOnlineOnlyCheckboxChange.bind(this)
+            );
     }    
 
     start() {
@@ -21,22 +27,35 @@ class App {
         this.database.get(this.onDatabaseUpdate.bind(this));
     }
 
-    // --[ events ]-------------------------------------------------------------
-    onDatabaseUpdate(database) {
-        console.log(database);
-        
+    rebuild() {
         const container = document.getElementById("container");
         container.innerHTML = "";
 
-        Object.entries(database.schedule).forEach(([serverId, players]) => {
+        Object.entries(this.database.schedule).forEach(([serverId, players]) => {
             this.addServerRow(serverId);
             Object.keys(players).forEach((playerId) => {
                 this.addPlayerRow(serverId, playerId);
             });
-        });
+        });        
+    }
+
+    // --[ events ]-------------------------------------------------------------
+    onDatabaseUpdate(database) {
+        console.log(database);
+        this.rebuild();
+    }
+
+    onOnlineOnlyCheckboxChange() {
+        this.rebuild();
     }
 
     // --[ helpers ]------------------------------------------------------------
+
+    isShowingOnlineOnly() {
+        const checkbox = document.getElementById("online-only-checkbox");
+        return checkbox.checked;
+    }
+
     addServerRow(serverId) {
         const container = document.getElementById("container");
 
@@ -61,9 +80,13 @@ class App {
         if (player == null) {
             return;
         }
+
         const playerName = player["name"];
         const playerStatus = this.database.getPlayerStatus(serverId, playerId);
         const playerAliases = player["aliases"];
+        if (this.isShowingOnlineOnly() && playerStatus != Status.online) {
+            return;
+        }
 
         const serverPlayers = document.getElementById(this.getServerPlayersId(serverId));
         
