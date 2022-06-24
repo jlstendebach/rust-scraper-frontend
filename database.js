@@ -93,4 +93,21 @@ export class Database {
         return this.players[playerId];
     }
 
+    getPlayerCount(serverId, status=null) {
+        // The server must exist
+        const server = this.schedule[serverId];
+        if (server == null) {
+            return Status.unknown;
+        }
+
+        let count = 0;
+        Object.entries(server).forEach(([playerId, player]) => {
+            if (status == null || this.getPlayerStatus(serverId, playerId) == status) {
+                count++;
+            }
+        });
+
+        return count;
+    }
+
 }

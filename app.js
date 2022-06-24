@@ -62,9 +62,11 @@ class App {
         const serverRow = container.appendChild(document.createElement("div"));
         serverRow.id = this.getServerRowId(serverId);
 
-        const serverName = serverRow.appendChild(document.createElement("h3"));
-        serverName.id = this.getServerNameId(serverId);
-        serverName.innerHTML = this.database.getServerName(serverId);
+        const serverName = this.database.getServerName(serverId);
+        const playerCount = this.database.getPlayerCount(serverId, Status.online);
+        const serverNameH3 = serverRow.appendChild(document.createElement("h3"));
+        serverNameH3.id = this.getServerNameId(serverId);
+        serverNameH3.innerHTML = serverName + " (" + playerCount + " online)";
 
         const serverPlayers = serverRow.appendChild(document.createElement("div"));
         serverPlayers.id = this.getServerPlayersId(serverId);
