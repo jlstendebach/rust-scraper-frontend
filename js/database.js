@@ -42,10 +42,23 @@ export class Database {
         onValue(
             ref(this.database, path), 
             function(snapshot) {
-                const all = snapshot.val();
-                this.players = all.players;
-                this.servers = all.servers;
-                this.schedule = all.schedule;
+                const data = snapshot.val();
+                if (data == null) {
+                    return;
+                }
+
+                console.log(data);
+
+                if (data.players != null) {
+                    this.players = data.players;
+                }
+                if (data.servers != null) {
+                    this.servers = data.servers;
+                }
+                if (data.schedule != null) {
+                    this.schedule = data.schedule;
+                }
+
                 if (callback != null) {
                     callback(this);
                 }
@@ -54,6 +67,46 @@ export class Database {
     }
 
     // --[ helpers ]------------------------------------------------------------
+    getServerName(serverId) {
+        const server = this.servers[serverId];
+        if (server == null) {
+            return null;
+        }
+
+        return server["name"];
+    }
+
+    getPlayerCount(serverId, status=null) {
+        // The server must exist
+        const server = this.schedule[serverId];
+        if (server == null) {
+            return Status.unknown;
+        }
+
+        let count = 0;
+        Object.keys(server).forEach((playerId) => {
+            if (status == null || this.getPlayerStatus(serverId, playerId) == status) {
+                count++;
+            }
+        });
+
+        return count;
+    }
+
+    // --[ players ]------------------------------------------------------------
+    getPlayer(playerId) {
+        return this.players[playerId];
+    }
+
+    getPlayerName(playerId) {
+        const player = this.players[playerId];
+        if (player == null) {
+            return null;
+        }
+
+        return player["name"];
+    }
+
     getPlayerStatus(serverId, playerId) {
         // The server must exist
         const server = this.schedule[serverId];
@@ -80,34 +133,35 @@ export class Database {
         return status;
     }
 
-    getServerName(serverId) {
-        const server = this.servers[serverId];
-        if (server == null) {
-            return "UNKNOWN";
+    getPlayerAliases(playerId) {
+        const player = this.players[playerId];
+        if (player == null) {
+            return [];
         }
 
-        return server["name"];
+        return Object.keys(player["aliases"]);
     }
 
-    getPlayer(playerId) {
-        return this.players[playerId];
-    }
-
-    getPlayerCount(serverId, status=null) {
-        // The server must exist
-        const server = this.schedule[serverId];
-        if (server == null) {
-            return Status.unknown;
+    getPlayerSchedule(serverId, playerId) {
+        const serverSchedule = this.schedule[serverId];
+        if (serverSchedule == null) {
+            return [];
         }
 
-        let count = 0;
-        Object.entries(server).forEach(([playerId, player]) => {
-            if (status == null || this.getPlayerStatus(serverId, playerId) == status) {
-                count++;
-            }
+        const playerSchedule = serverSchedule[playerId];
+        if (playerSchedule == null) {
+            return [];
+        }
+
+        let schedule = [];
+        Object.entries(playerSchedule).forEach(([timestamp, entry]) => {
+            schedule.push({
+                timestamp: timestamp,
+                status: entry["status"]
+            });
         });
 
-        return count;
+        return schedule;
     }
 
 }

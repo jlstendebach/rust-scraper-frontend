@@ -11,6 +11,7 @@ html, body {
 body {
     display: grid;
     gap: 1rem;
+    grid-auto-rows: min-content;
     padding: 1.0rem;
 }
 
@@ -55,6 +56,7 @@ input {
 #container {
     display: grid;
     gap: 1rem;
+
     background-color: #2a2a2a;
 
     padding: 0.25rem;
@@ -64,6 +66,9 @@ input {
 }
 
 #options {
+    display: flex;
+    align-items: center;
+
     background-color: #2a2a2a;
     padding: 0.25rem;
     margin: 0;
@@ -74,8 +79,7 @@ input {
 .server-players {
     display: grid;
     grid-template-columns: min-content min-content auto;
-    column-gap: 2.00rem;
-    row-gap: 0.5rem;
+    gap: 0;
     white-space: nowrap;
 }
 
@@ -87,6 +91,28 @@ input {
 .player-row {
     display: contents;
 }
+
+.player-row:nth-child(even) > * {
+    background-color: #272727;
+}
+
+.player-row:hover > * {
+    background-color: #333;
+}
+
+.player-schedule {
+    display: none;
+    grid-column: 1 / 4;
+    padding-top: 0.25rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.player-data {
+    padding: 0.25rem 0 0.25rem 0;
+    padding-right: 2.0rem;
+}
+
 
 
 

@@ -8,42 +8,15 @@
 
     <body>
         <!-- body ------------------------------------------------------------->
-        <h1>Trackinator v0.0.3</h1>
+        <h1>Trackinator v0.0.4</h1>
         <div id="options">
-            <label for="online-only-checkbox">Online Only:</label>
+            <label for="online-only-checkbox">Online Only:&nbsp;</label>
             <input id="online-only-checkbox" type="checkbox">
         </div> 
-        <div id="container">
-            <div id="server-row-1234">
-                <h3 id="server-name-1234">Server Name</h3>
-                <div id="server-players-1234" class="server-players"> 
-                    <div class="players-header">
-                        <div>Name</div>
-                        <div>Status</div>
-                        <div>Aliases</div>
-                    </div>
-                    <div id="player-row-4321" class="player-row">
-                        <div>Player Name</div>
-                        <div><span class="dot offline"></span>Offline</div>
-                        <div>Alias1, Alias2, Alias3</div>
-                    </div>
-                    <div id="player-row-4321" class="player-row">
-                        <div>Player Name</div>
-                        <div><span class="dot online"></span>Online</div>
-                        <div>Alias1, Alias2, Alias3</div>
-                    </div>
-                    <div id="player-row-4321" class="player-row">
-                        <div>Player Name</div>
-                        <div><span class="dot"></span>Unknown</div>
-                        <div>Alias1, Alias2, Alias3</div>
-                    </div>
-                </div>    
-            </div>
-
-
+        <div id="container"></div>
         <!-- js --------------------------------------------------------------->
-        <script type="module" src="./database.js"></script>
-        <script type="module" src="./app.js"></script>
+        <script type="module" src="./js/database.js"></script>
+        <script type="module" src="./js/app.js"></script>
     </body>
 
 </html>
