@@ -29,7 +29,7 @@ export class ServerRow extends HTMLElement {
         Object.keys(players).forEach((playerId) => {
             const playerRow = this.getOrCreatePlayerRow(playerId);
             playerRow.populate(database, serverId, playerId);
-            playerRow.toggleVisible(this.statusFilter == null || database.getPlayerStatus(playerId) == this.statusFilter);
+            playerRow.toggleVisible(this.statusFilter == null || database.getPlayerStatus(serverId, playerId) == this.statusFilter);
         });
     }
 

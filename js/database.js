@@ -139,6 +139,11 @@ export class Database {
             return [];
         }
 
+        const aliases = player["aliases"];
+        if (aliases == null) {
+            return [];
+        }
+
         return Object.keys(player["aliases"]);
     }
 
