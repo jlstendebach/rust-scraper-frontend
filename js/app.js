@@ -33,7 +33,7 @@ class App {
         Object.entries(this.database.schedule).forEach(([serverId, players]) => {
             const serverRow = this.getOrCreateServerRow(serverId);
             serverRow.setStatusFilter(this.isShowingOnlineOnly() ? Status.online : null);
-            serverRow.populate(this.database, serverId);
+            serverRow.populate();
         });        
     }
 
@@ -51,7 +51,7 @@ class App {
         let row = this.serverRows[serverId];        
         if (row == null) {
             const container = document.getElementById("container");
-            row = new ServerRow();
+            row = new ServerRow(this.database, serverId);
             container.appendChild(row);
             this.serverRows[serverId] = row;
         }

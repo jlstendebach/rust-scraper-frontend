@@ -128,6 +128,14 @@ export class PlayerRow extends HTMLElement {
         this.className = classes.join(" ");
     }
 
+    hasName(name) {
+        name = name.toUpperCase();
+        return (
+            this.nameDiv.innerText.toUpperCase().includes(name) || 
+            this.aliasesDiv.innerText.toUpperCase().includes(name)
+        );
+    }
+
     addTime(timestamp1, timestamp2) {
         const div = this.scheduleDiv.appendChild(document.createElement("div"));
         const date1 = this.formatTimestamp(timestamp1);

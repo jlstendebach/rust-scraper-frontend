@@ -99,7 +99,7 @@ export class Database {
     getPlayerName(playerId) {
         const player = this.players[playerId];
         if (player == null) {
-            return null;
+            return "UNKNOWN";
         }
 
         return player["name"];

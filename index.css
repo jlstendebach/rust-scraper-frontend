@@ -29,14 +29,17 @@ h2 {
 }
 
 h3 {
-    padding: 0 0 0.15rem 0;
-    margin: 0 0 0.30rem 0;
-    border-bottom: 1px solid #888;
+    padding: 0;
+    margin: 0;
 }
 
 input {
     margin: 0;
-    padding: 0;
+    border: 0;
+    border-radius: 2px;
+    padding-left: 0.25rem;
+    background-color: #202020;
+    color: inherit;
 }
 
 ::-webkit-scrollbar {
@@ -76,6 +79,18 @@ input {
 
 
 /* --[ classes ]------------------------------------------------------------- */
+.server-header {
+    display: grid;
+    grid-template-columns: min-content auto;
+    gap: 0.5rem;
+
+    white-space: nowrap;
+
+    padding: 0.5rem 0 0.65rem 0;
+    margin: 0 0 0.30rem 0;
+    border-bottom: 1px solid #888;
+}
+
 .server-players {
     display: grid;
     grid-template-columns: min-content min-content auto;
