@@ -26,10 +26,14 @@ export class ServerRow extends HTMLElement {
 
         // Players
         const players = database.schedule[serverId];        
+        let alternateColor = false;
         Object.keys(players).forEach((playerId) => {
             const playerRow = this.getOrCreatePlayerRow(playerId);
             playerRow.populate(database, serverId, playerId);
             playerRow.toggleVisible(this.statusFilter == null || database.getPlayerStatus(serverId, playerId) == this.statusFilter);
+            if (playerRow.isVisible()) {
+                playerRow.toggleAlternateColor(alternateColor = !alternateColor);
+            }
         });
     }
 

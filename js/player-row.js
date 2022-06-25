@@ -111,6 +111,23 @@ export class PlayerRow extends HTMLElement {
         }
     }
 
+    toggleAlternateColor(on) {
+        let split = this.className.split(" ");
+        let classes = split;
+        if (on) {
+            if (!split.includes("player-row-alternate")) {
+                split.push("player-row-alternate");
+            }    
+
+        } else {
+            classes = split.filter(function(value) {
+                return value != "player-row-alternate";
+            });
+        }
+
+        this.className = classes.join(" ");
+    }
+
     addTime(timestamp1, timestamp2) {
         const div = this.scheduleDiv.appendChild(document.createElement("div"));
         const date1 = this.formatTimestamp(timestamp1);

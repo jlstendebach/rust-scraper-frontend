@@ -47,8 +47,6 @@ export class Database {
                     return;
                 }
 
-                console.log(data);
-
                 if (data.players != null) {
                     this.players = data.players;
                 }

@@ -92,7 +92,7 @@ input {
     display: contents;
 }
 
-.player-row:nth-child(even) > * {
+.player-row-alternate > * {
     background-color: #272727;
 }
 
