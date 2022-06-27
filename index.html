@@ -8,15 +8,22 @@
 
     <body>
         <!-- body ------------------------------------------------------------->
-        <h1>Trackinator v0.0.5</h1>
+        <h1>Trackinator v0.0.6</h1>
         <div id="options">
             <label for="online-only-checkbox">Online Only:&nbsp;</label>
             <input id="online-only-checkbox" type="checkbox" checked>
         </div> 
         <div id="container"></div>
         <!-- js --------------------------------------------------------------->
-        <script type="module" src="./js/database.js"></script>
-        <script type="module" src="./js/app.js"></script>
+        <script type="module">
+            import { App } from "./js/app.js"
+
+            window.addEventListener("load", function() {
+                window.removeEventListener("load", this)
+                let app = new App();
+                app.start();
+            })
+        </script>
     </body>
 
 </html>

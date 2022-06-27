@@ -1,4 +1,4 @@
-import { Status } from "./database.js";
+import { DatabaseEvents, Status } from "./database.js";
 import { PlayerRow } from "./player-row.js";
 
 export class ServerRow extends HTMLElement {
@@ -38,6 +38,15 @@ export class ServerRow extends HTMLElement {
     }
 
     populate() {
+        let populateTime = new Date().getTime();
+
+        // The playersDiv can have a large number of elements. Removing it and 
+        // doing operations on it drastically increases performance.
+        const parentNode = this.playersDiv.parentNode;
+        const nextSibling = this.playersDiv.nextSibling;
+        parentNode.removeChild(this.playersDiv);
+        this.removeAllPlayerRows();
+
         // Name
         const name = this.database.getServerName(this.serverId);
         const playerCount = this.database.getPlayerCount(this.serverId, Status.online);
@@ -54,21 +63,23 @@ export class ServerRow extends HTMLElement {
             }.bind(this))
             .forEach(function(playerId) {
                 const playerRow = this.getOrCreatePlayerRow(playerId);
-                playerRow.populate(this.database, this.serverId, playerId);
-                playerRow.toggleVisible(
-                    (
-                        this.statusFilter == null || 
-                        this.database.getPlayerStatus(this.serverId, playerId) == this.statusFilter
-                    ) &&
-                    (
-                        this.nameFilter == null ||
-                        playerRow.hasName(this.nameFilter)
-                    )
-                );
-                if (playerRow.isVisible()) {
+                if (this.shouldShowPlayer(playerId)) {
+                    playerRow.populate(this.database, this.serverId, playerId);
                     playerRow.toggleAlternateColor(alternateColor = !alternateColor);
-                }
+                    this.playersDiv.appendChild(playerRow);
+                }    
             }.bind(this));
+
+        // Reinsert the playersDiv
+        if (nextSibling) {
+            parentNode.insertBefore(this.playersDiv, nextSibling);
+        } else {
+            parentNode.appendChild(this.playersDiv);
+        }     
+
+        // Log the time passed
+        populateTime = Math.round(new Date().getTime() - populateTime);
+        console.log("ServerRow.populate():", populateTime);
     }
 
     setStatusFilter(status) {
@@ -83,7 +94,6 @@ export class ServerRow extends HTMLElement {
         let row = this.playerRows[playerId];
         if (row == null) {
             row = new PlayerRow();
-            this.playersDiv.appendChild(row);
             this.playerRows[playerId] = row;
         }
         return row;
@@ -93,6 +103,34 @@ export class ServerRow extends HTMLElement {
     onSearchBarChange() {
         this.setNameFilter(this.searchBar.value);
         this.populate();
+    }
+
+    // --[ helpers ]------------------------------------------------------------
+    removeAllPlayerRows() {
+        while (this.playersDiv.firstChild) {
+            this.playersDiv.removeChild(this.playersDiv.firstChild);
+        }
+        this.playersDiv.appendChild(this.playersHeaderDiv);
+    }
+
+    shouldShowPlayer(playerId) {
+        const status = this.database.getPlayerStatus(this.serverId, playerId);
+        if (this.statusFilter != null && status != this.statusFilter) {
+            return false;
+        }
+
+        const aliases = this.database.getPlayerAliases(playerId);
+        if (this.nameFilter == null) {
+            return true;
+        }
+
+        for (let i = 0; i < aliases.length; i++) {
+            if (aliases[i].toUpperCase().includes(this.nameFilter.toUpperCase())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

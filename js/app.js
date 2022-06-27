@@ -1,11 +1,10 @@
-import { Database, Status } from "./database.js"
+import { Database, DatabaseEvents, Status } from "./database.js"
 import { ServerRow } from "./server-row.js"
 
-class App {
+export class App {
     database = new Database();
-    frequency = 10*1000; // update every 10 seconds
-    interval = null; 
     serverRows = {};
+    shouldRebuild = true;
 
     constructor() {
         document
@@ -14,35 +13,46 @@ class App {
                 "change", 
                 this.onOnlineOnlyCheckboxChange.bind(this)
             );
+        
+        this.database.addEventListener(
+            DatabaseEvents.UPDATE, 
+            this.onDatabaseUpdate, 
+            this
+        );
     }    
 
     start() {
-        this.loop();
-        this.interval = window.setInterval(this.loop.bind(this), this.frequency);
+        requestAnimationFrame(this.loop.bind(this));
     }   
     
-    stop() {
-        window.clearInterval(this.interval);
-    }
-
     loop() {
-        this.database.get(this.onDatabaseUpdate.bind(this));
+        if (this.shouldRebuild) {
+            this.rebuild();
+            this.shouldRebuild = false;
+        }
+        setTimeout(function() {
+            requestAnimationFrame(this.loop.bind(this));
+        }.bind(this), 1000);
     }
 
     rebuild() {
+        let rebuildTime = new Date().getTime();
         Object.entries(this.database.schedule).forEach(([serverId, players]) => {
             const serverRow = this.getOrCreateServerRow(serverId);
             serverRow.setStatusFilter(this.isShowingOnlineOnly() ? Status.online : null);
             serverRow.populate();
         });        
+        rebuildTime = Math.round(new Date().getTime() - rebuildTime);
+        console.log("App.rebuild():", rebuildTime);
     }
 
     // --[ events ]-------------------------------------------------------------
-    onDatabaseUpdate(database) {
-        this.rebuild();
+    onDatabaseUpdate(type, database) {
+        this.shouldRebuild = true;
     }
 
     onOnlineOnlyCheckboxChange() {
+        console.log("onOnlineOnlyCheckboxChange");
         this.rebuild();
     }
 
@@ -66,9 +76,3 @@ class App {
 }
 
 
-// --[ on load ]----------------------------------------------------------------
-window.addEventListener("load", function() {
-    window.removeEventListener("load", this)
-    let app = new App();
-    app.start();
-})

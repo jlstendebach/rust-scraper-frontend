@@ -1,5 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js'
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js"
+import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/src/index.js";
 
 export class Status {    
     static online = "online";
@@ -16,12 +17,17 @@ class Node {
 }
 
 
+export class DatabaseEvents {
+    static UPDATE = "DatabaseUpdateEvent";
+}
+
 export class Database {
     app = null;
     database = null;
     players = {};
     servers = {};
     schedule = {};
+    eventEmitter = new EventEmitter();
 
     constructor() {
         this.app = initializeApp({
@@ -35,12 +41,11 @@ export class Database {
             measurementId: "G-M1EF9VHR0N"
         });
         this.database = getDatabase(this.app);
-    }
 
-    get(callback) {
-        const path = Node.all;
+        // onValue automatically updates whenever there is a change on the 
+        // Firebase side.
         onValue(
-            ref(this.database, path), 
+            ref(this.database, Node.all), 
             function(snapshot) {
                 const data = snapshot.val();
                 if (data == null) {
@@ -57,13 +62,24 @@ export class Database {
                     this.schedule = data.schedule;
                 }
 
-                if (callback != null) {
-                    callback(this);
-                }
+                this.emitEvent(DatabaseEvents.UPDATE, this);
             }.bind(this)
-        );
+        );        
     }
 
+    // --[ events ]-------------------------------------------------------------
+    addEventListener(type, callback, owner=null) {
+        this.eventEmitter.add(type, callback, owner);
+    }
+
+    removeEventListener(type, callback, owner=null) {
+        this.eventEmitter.remove(type, callback, owner);
+    }
+
+    emitEvent(type, event) {
+        this.eventEmitter.emit(type, event);
+    }
+    
     // --[ helpers ]------------------------------------------------------------
     getServerName(serverId) {
         const server = this.servers[serverId];
@@ -106,29 +122,11 @@ export class Database {
     }
 
     getPlayerStatus(serverId, playerId) {
-        // The server must exist
-        const server = this.schedule[serverId];
-        if (server == null) {
-            return Status.unknown;
-        }
-
-        // The player must exist
-        const player = server[playerId];
+        const player = this.players[playerId];
         if (player == null) {
             return Status.unknown;
         }
-
-        // Find the status
-        let maxTimestamp = 0;
-        let status = Node.unknown;
-        Object.entries(player).forEach(([timestamp, value]) => {
-            if (timestamp > maxTimestamp) {
-                maxTimestamp = timestamp;
-                status = value["status"];
-            }
-        });
-
-        return status;
+        return player["server"] == serverId ? Status.online : Status.offline;
     }
 
     getPlayerAliases(playerId) {

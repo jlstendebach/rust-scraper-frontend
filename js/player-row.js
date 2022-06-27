@@ -89,7 +89,7 @@ export class PlayerRow extends HTMLElement {
 
     toggleVisible(visible=null) {
         if (visible == null) {
-            this.style.display = (this.isVisible() ? "none" : "contents");
+            this.toggleVisible(!this.isVisible());
 
         } else {
             this.style.display = (visible ? "contents" : "none");            
@@ -112,28 +112,20 @@ export class PlayerRow extends HTMLElement {
     }
 
     toggleAlternateColor(on) {
+        const alternate = "player-row-alternate";
         let split = this.className.split(" ");
-        let classes = split;
         if (on) {
-            if (!split.includes("player-row-alternate")) {
-                split.push("player-row-alternate");
+            if (!split.includes(alternate)) {
+                split.push(alternate);
             }    
 
         } else {
-            classes = split.filter(function(value) {
-                return value != "player-row-alternate";
+            split = split.filter(function(value) {
+                return value != alternate;
             });
         }
 
-        this.className = classes.join(" ");
-    }
-
-    hasName(name) {
-        name = name.toUpperCase();
-        return (
-            this.nameDiv.innerText.toUpperCase().includes(name) || 
-            this.aliasesDiv.innerText.toUpperCase().includes(name)
-        );
+        this.className = split.join(" ");
     }
 
     addTime(timestamp1, timestamp2) {
