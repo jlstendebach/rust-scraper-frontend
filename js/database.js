@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js'
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js"
-import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/src/index.js";
+import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/release/1.0.0/events/EventEmitter.js";
 
 export class Status {    
     static online = "online";
