@@ -20,6 +20,9 @@ export class ServerRow extends HTMLElement {
         this.database = database;
         this.serverId = serverId;
 
+        this.id = "server-row-"+serverId;
+        this.classList.add("server-row");
+
         // Header
         this.headerDiv = this.appendChild(document.createElement("div"));
         this.headerDiv.className = "server-header";
@@ -33,10 +36,13 @@ export class ServerRow extends HTMLElement {
         this.playersDiv = this.appendChild(document.createElement("div"));
         this.playersDiv.className = "server-players";
         this.playersHeaderDiv = this.playersDiv.appendChild(document.createElement("div"));
-        this.playersHeaderDiv.className = "players-header";
-        this.playersHeaderDiv.innerHTML = "<div>Name</div><div>Status</div><div>Aliases</div>";
+        this.playersHeaderDiv.className = "player-row bold";
+        this.playersHeaderDiv.innerHTML = "<div class='player-data'>Name</div>";
+        this.playersHeaderDiv.innerHTML += "<div class='player-data'>Status</div>";
+        this.playersHeaderDiv.innerHTML += "<div class='player-data'>Aliases</div>";
     }
 
+    // -------------------------------------------------------------------------
     populate() {
         let populateTime = new Date().getTime();
 
@@ -49,7 +55,7 @@ export class ServerRow extends HTMLElement {
 
         // Name
         const name = this.database.getServerName(this.serverId);
-        const playerCount = this.database.getPlayerCount(this.serverId, Status.online);
+        const playerCount = this.database.getPlayerCount(this.serverId, Status.ONLINE);
         this.header.innerHTML = name + " (" + playerCount + " online)";
 
         // Players
@@ -86,8 +92,11 @@ export class ServerRow extends HTMLElement {
         this.statusFilter = status;
     }
 
-    setNameFilter(name) {
-        this.nameFilter = name;
+    setNameFilter(name) {        
+        this.nameFilter = name.toUpperCase().trim();
+        if (this.nameFilter.length == 0) {
+            this.nameFilter = null;
+        }
     }
 
     getOrCreatePlayerRow(playerId) {
@@ -124,10 +133,17 @@ export class ServerRow extends HTMLElement {
             return true;
         }
 
+        const nameFilters = this.nameFilter.split(",");
         for (let i = 0; i < aliases.length; i++) {
-            if (aliases[i].toUpperCase().includes(this.nameFilter.toUpperCase())) {
-                return true;
-            }
+            for (let j = 0; j < nameFilters.length; j++) {
+                const nameFilter = nameFilters[j].toUpperCase().trim();
+                if (nameFilter.length <= 0) {
+                    continue;
+                }
+                if (aliases[i].toUpperCase().includes(nameFilter)) {
+                    return true;
+                }
+            }            
         }
 
         return false;

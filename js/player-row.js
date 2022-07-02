@@ -1,11 +1,13 @@
 import { StatusIndicator } from "./status-indicator.js";
 import { Status } from "./database.js"
+import { PlaytimeTable } from "./playtime-table.js";
 
 export class PlayerRow extends HTMLElement {
     nameDiv = null;
     statusIndicator = null;
     aliasesDiv = null;
     scheduleDiv = null;
+    playtimeTable = new PlaytimeTable();
 
     constructor(parent) {
         super();
@@ -31,6 +33,7 @@ export class PlayerRow extends HTMLElement {
         // Schedule
         this.scheduleDiv = this.appendChild(document.createElement("div"));
         this.scheduleDiv.className = "player-schedule";
+        this.scheduleDiv.appendChild(this.playtimeTable);
     }
 
     populate(database, serverId, playerId) {
@@ -54,8 +57,10 @@ export class PlayerRow extends HTMLElement {
 
         // Schedule
         const schedule = database.getPlayerSchedule(serverId, playerId);
+        this.playtimeTable.loadFromSchedule(schedule);
+        /*
         let timestamp1 = 0;
-        let status1 = Status.offline;
+        let status1 = Status.OFFLINE;
 
         this.scheduleDiv.innerHTML = "";
 
@@ -63,16 +68,17 @@ export class PlayerRow extends HTMLElement {
             let timestamp2 = schedule[i].timestamp;
             let status2 = schedule[i].status;
 
-            if (status2 != status1 && status2 == Status.offline) {
+            if (status2 != status1 && status2 == Status.OFFLINE) {
                 this.addTime(timestamp1, timestamp2);
             }
 
             timestamp1 = timestamp2;
             status1 = status2;
         }
-        if (timestamp1 > 0 && status1 == Status.online) {    
+        if (timestamp1 > 0 && status1 == Status.ONLINE) {    
             this.addTime(timestamp1, Math.round((new Date()).getTime() / 1000));
         }        
+        */
     }
 
     // --[ events ]-------------------------------------------------------------
@@ -81,21 +87,6 @@ export class PlayerRow extends HTMLElement {
     }
 
     // --[ helpers ]------------------------------------------------------------
-    isVisible() {
-        const style = window.getComputedStyle(this);
-        const display = style.getPropertyValue("display");
-        return display != "none";
-    }
-
-    toggleVisible(visible=null) {
-        if (visible == null) {
-            this.toggleVisible(!this.isVisible());
-
-        } else {
-            this.style.display = (visible ? "contents" : "none");            
-        }
-    }
-
     isScheduleVisible() {
         const style = window.getComputedStyle(this.scheduleDiv);
         const display = style.getPropertyValue("display");
@@ -111,21 +102,13 @@ export class PlayerRow extends HTMLElement {
         }
     }
 
-    toggleAlternateColor(on) {
-        const alternate = "player-row-alternate";
-        let split = this.className.split(" ");
+    toggleAlternateColor(on) {        
+        const alternateClass = "player-row-alternate";
         if (on) {
-            if (!split.includes(alternate)) {
-                split.push(alternate);
-            }    
-
+            this.classList.add(alternateClass);
         } else {
-            split = split.filter(function(value) {
-                return value != alternate;
-            });
+            this.classList.remove(alternateClass);
         }
-
-        this.className = split.join(" ");
     }
 
     addTime(timestamp1, timestamp2) {

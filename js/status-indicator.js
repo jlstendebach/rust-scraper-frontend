@@ -8,17 +8,17 @@ export class StatusIndicator extends HTMLElement {
         super();
         this.statusDot = this.appendChild(document.createElement("span"));
         this.statusText = this.appendChild(document.createElement("span"));
-        this.setStatus(Status.unknown);
+        this.setStatus(Status.UNKNOWN);
     }
 
     setStatus(status) {
         switch (status) {
-            case Status.online:
+            case Status.ONLINE:
                 this.statusDot.className = "dot online";
                 this.statusText.innerHTML = "Online";
                 break;
 
-            case Status.offline:
+            case Status.OFFLINE:
                 this.statusDot.className = "dot offline";
                 this.statusText.innerHTML = "Offline";
                 break;

@@ -3,6 +3,9 @@ import { ServerRow } from "./server-row.js"
 
 export class App {
     database = new Database();
+
+    serverList = document.getElementById("server-list");
+    serversContainer = document.getElementById("servers-container");
     serverRows = {};
     shouldRebuild = true;
 
@@ -32,14 +35,14 @@ export class App {
         }
         setTimeout(function() {
             requestAnimationFrame(this.loop.bind(this));
-        }.bind(this), 1000);
+        }.bind(this), 250);
     }
 
     rebuild() {
         let rebuildTime = new Date().getTime();
         Object.entries(this.database.schedule).forEach(([serverId, players]) => {
             const serverRow = this.getOrCreateServerRow(serverId);
-            serverRow.setStatusFilter(this.isShowingOnlineOnly() ? Status.online : null);
+            serverRow.setStatusFilter(this.isShowingOnlineOnly() ? Status.ONLINE : null);
             serverRow.populate();
         });        
         rebuildTime = Math.round(new Date().getTime() - rebuildTime);
@@ -60,10 +63,13 @@ export class App {
     getOrCreateServerRow(serverId) {
         let row = this.serverRows[serverId];        
         if (row == null) {
-            const container = document.getElementById("container");
+            // Create the row
             row = new ServerRow(this.database, serverId);
-            container.appendChild(row);
+            this.serversContainer.appendChild(row);
             this.serverRows[serverId] = row;
+
+            // Add to the server list
+            this.addToServerList(this.database.getServerName(serverId), row.id);
         }
         return row;
     }
@@ -71,6 +77,15 @@ export class App {
     isShowingOnlineOnly() {
         const checkbox = document.getElementById("online-only-checkbox");
         return checkbox.checked;
+    }
+
+    addToServerList(serverName, rowId) {
+        const div = this.serverList.appendChild(document.createElement("div"));
+        div.innerHTML = "-&nbsp;";
+
+        const link = div.appendChild(document.createElement("a"));
+        link.href = "#"+rowId;
+        link.innerHTML = serverName;
     }
 
 }

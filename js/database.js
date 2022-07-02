@@ -3,9 +3,17 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.
 import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/release/1.0.0/events/EventEmitter.js";
 
 export class Status {    
-    static online = "online";
-    static offline = "offline";
-    static unknown = "unknown";
+    static ONLINE = "online";
+    static OFFLINE = "offline";
+    static UNKNOWN = "unknown";
+
+    static opposite(status) {
+        switch (status) {
+            case Status.ONLINE: return Status.OFFLINE;
+            case Status.OFFLINE: return Status.ONLINE;
+            default: Status.UNKNOWN;
+        }
+    }
 }
 
 class Node {
@@ -94,7 +102,7 @@ export class Database {
         // The server must exist
         const server = this.schedule[serverId];
         if (server == null) {
-            return Status.unknown;
+            return Status.UNKNOWN;
         }
 
         let count = 0;
@@ -124,9 +132,9 @@ export class Database {
     getPlayerStatus(serverId, playerId) {
         const player = this.players[playerId];
         if (player == null) {
-            return Status.unknown;
+            return Status.UNKNOWN;
         }
-        return player["server"] == serverId ? Status.online : Status.offline;
+        return player["server"] == serverId ? Status.ONLINE : Status.OFFLINE;
     }
 
     getPlayerAliases(playerId) {

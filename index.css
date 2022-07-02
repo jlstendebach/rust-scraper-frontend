@@ -1,14 +1,44 @@
+:root {
+    --header-height: 3rem;
+    --scrollbar-width: 0.5rem;
+}
+
+
 html, body {
     background-color: #222;
     color: #ccc;
     border: 0;
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
+    overflow: hidden;
     font-family: 'Courier New', Courier, monospace;
 }
 
-body {
+html {
+    overflow-y: scroll;
+}
+
+header {
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-columns: min-content min-content;
+    align-items: center;
+    justify-content: space-between;
+
+    background-color: #2a2a2a;
+    border-bottom: 0.25rem solid #222;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    z-index: 999;
+    padding: 0.5rem;
+    white-space: nowrap;
+    width: 100%;
+    height: var(--header-height);
+}
+
+content {
     display: grid;
     gap: 1rem;
     grid-auto-rows: min-content;
@@ -42,8 +72,16 @@ input {
     color: inherit;
 }
 
+a {
+    color: #ccc;
+}
+
+a:hover {
+    color: #888;
+}
+
 ::-webkit-scrollbar {
-    width: 8px;
+    width: var(--scrollbar-width);
 }
 ::-webkit-scrollbar-track {
     background: #111;
@@ -53,19 +91,9 @@ input {
 }
 
 
-/*************/
-/* container */
-/*************/
-#container {
-    display: grid;
-    gap: 1rem;
-
-    background-color: #2a2a2a;
-
-    padding: 0.25rem;
-    margin: 0;
-
-    width: calc(100vw - 0.5rem - 2.0rem);
+/* --[ ids ]----------------------------------------------------------------- */
+#top {
+    height: calc(var(--header-height) - 2px);
 }
 
 #options {
@@ -77,8 +105,38 @@ input {
     margin: 0;
 }
 
+#server-list {
+    background-color: #2a2a2a;
+    padding: 0.25rem;  
+    padding-bottom: 0.5rem;  
+}
+
+#server-list > h3 {
+    padding: 0.25rem 0;
+}
+
+#servers-container {
+    box-sizing: border-box;
+
+    display: grid;
+    gap: 1rem;
+
+    padding: 0;
+    margin: 0;
+
+    width: 100%;
+}
 
 /* --[ classes ]------------------------------------------------------------- */
+
+/***********/
+/* servers */
+/***********/
+.server-row {
+    background-color: #2a2a2a;
+    padding: 0.25rem;
+}
+
 .server-header {
     display: grid;
     grid-template-columns: min-content auto;
@@ -98,22 +156,23 @@ input {
     white-space: nowrap;
 }
 
-.players-header {
-    display: contents;
-    font-weight: bold;
-}
-
+/***********/
+/* players */
+/***********/
 .player-row {
     display: contents;
+    cursor: pointer;
 }
 
 .player-row-alternate > * {
     background-color: #272727;
 }
 
+/*
 .player-row:hover > * {
-    background-color: #333;
+    background-color: #303030;
 }
+*/
 
 .player-schedule {
     display: none;
@@ -124,13 +183,86 @@ input {
 }
 
 .player-data {
+    display: flex;
+    align-items: center;
     padding: 0.25rem 0 0.25rem 0;
     padding-right: 2.0rem;
 }
 
+/*****************/
+/* playtime view */
+/*****************/
+.playtime-table {
+    display: grid;
+    grid-template-columns: min-content auto min-content;
+    grid-auto-rows: 1.3rem;
+    row-gap: 0.5rem;
+    column-gap: 0.5rem;
 
+    white-space: nowrap;
+    padding: 0;
+}
 
+.playtime-table > div {
+    display: flex;
+    align-items: center;
+}
 
+.playtime-view {
+    display: flex;
+    flex-direction: row;
+
+    height: 100%;
+    width: 100%;
+    background-color: #333;
+
+    padding: 0;
+    margin: 0;
+    border: 1px solid #444;
+}
+
+.playtime-view-line {
+    display: none;
+    left: 0;
+    position: relative;
+    width: 2px;
+    height: 100%;
+    background-color: red;
+    margin-right: -2px;
+}
+
+.playtime-view-tooltip {
+    display: none;
+    background-color: #111b;
+    color: #ccc;
+    border-radius: 3px;
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.playtime-view-online {
+    background-color: lime;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 100%;
+}
+
+.playtime-view-offline {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 100%;
+}
+
+/*********/
+/* other */
+/*********/
 .dot {
     height: 0.6rem;
     width: 0.6rem;
@@ -147,4 +279,12 @@ input {
 
 .online {
     background-color: lime;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
 }
