@@ -8,15 +8,33 @@
 
     <body>
         <!-- body ------------------------------------------------------------->
-        <h1>Trackinator v0.0.6</h1>
-        <div id="options">
-            <label for="online-only-checkbox">Online Only:&nbsp;</label>
-            <input id="online-only-checkbox" type="checkbox" checked>
-        </div> 
-        <div id="container"></div>
+        <header>
+            <h2>Trackinator v1.0.0</h2>
+            <span>[<a href="#top">Top</a>]</span>
+        </header>
+
+        <div id="top"></div>
+
+        <content>
+            <div id="options">
+                <label for="online-only-checkbox">Online Only:&nbsp;</label>
+                <input id="online-only-checkbox" type="checkbox" checked>
+            </div> 
+    
+            <div id="server-list">
+                <h3>Servers:</h3>
+            </div>
+    
+            <div id="servers-container"></div>    
+
+        </content>
+
+
+
         <!-- js --------------------------------------------------------------->
         <script type="module">
             import { App } from "./js/app.js"
+            import { PlaytimeView } from "./js/playtime-view.js"
 
             window.addEventListener("load", function() {
                 window.removeEventListener("load", this)
