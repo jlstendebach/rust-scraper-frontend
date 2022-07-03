@@ -70,7 +70,7 @@ export class ServerRow extends HTMLElement {
             .forEach(function(playerId) {
                 const playerRow = this.getOrCreatePlayerRow(playerId);
                 if (this.shouldShowPlayer(playerId)) {
-                    playerRow.populate(this.database, this.serverId, playerId);
+                    playerRow.populate();
                     playerRow.toggleAlternateColor(alternateColor = !alternateColor);
                     this.playersDiv.appendChild(playerRow);
                 }    
@@ -102,7 +102,7 @@ export class ServerRow extends HTMLElement {
     getOrCreatePlayerRow(playerId) {
         let row = this.playerRows[playerId];
         if (row == null) {
-            row = new PlayerRow();
+            row = new PlayerRow(this.database, this.serverId, playerId);
             this.playerRows[playerId] = row;
         }
         return row;

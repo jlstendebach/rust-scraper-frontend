@@ -68,6 +68,14 @@ export class PlaytimeTable extends HTMLElement {
         return "("+hours.toFixed(1)+" hours)";
     }
 
+    isSameDay(date1, date2) {
+        return (
+            date1.getFullYear() == date2.getFullYear() &&
+            date1.getMonth() == date2.getMonth() &&
+            date1.getDate() == date2.getDate()
+        );
+    }
+
     getDate(seconds) {
         let temp = this.getDateTime(seconds);
         return new Date(temp.getFullYear(), temp.getMonth(), temp.getDate());
@@ -114,6 +122,7 @@ export class PlaytimeTable extends HTMLElement {
         for (let i = 0; i < schedule.length; i++) {
             const isLast = (i == schedule.length-1);
             const isFirstEntry = (entries.length == 0);
+            const isToday = this.isSameDay(date, new Date());
             let timestamp = schedule[i].timestamp;
             let status = schedule[i].status;
             let scheduleDate = this.getDateTime(timestamp);
@@ -149,11 +158,13 @@ export class PlaytimeTable extends HTMLElement {
                     timestamp2: timestamp,
                     status: lastStatus
                 });            	
-                
+
                 if (isLast) {
                     entries.push({
                         timestamp1: timestamp,
-                        timestamp2: this.dateToSeconds(endOfDay),
+                        timestamp2: isToday 
+                            ? this.dateToSeconds(new Date())
+                            : this.dateToSeconds(endOfDay),
                         status: status
                     });            	
                 }

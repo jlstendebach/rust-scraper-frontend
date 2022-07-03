@@ -3,14 +3,21 @@ import { Status } from "./database.js"
 import { PlaytimeTable } from "./playtime-table.js";
 
 export class PlayerRow extends HTMLElement {
-    nameDiv = null;
-    statusIndicator = null;
-    aliasesDiv = null;
-    scheduleDiv = null;
+    database = null;
+    serverId = null;
+    playerId = null;
+
+    nameDiv = document.createElement("div");
+    statusIndicator = new StatusIndicator();
+    aliasesDiv = document.createElement("div");
+    scheduleDiv = document.createElement("div");
     playtimeTable = new PlaytimeTable();
 
-    constructor(parent) {
+    constructor(database, serverId, playerId) {
         super();
+        this.database = database;
+        this.serverId = serverId;
+        this.playerId = playerId;
 
         // Content row        
         this.className = "player-row";
@@ -19,34 +26,33 @@ export class PlayerRow extends HTMLElement {
         }.bind(this));
 
         // Name
-        this.nameDiv = this.appendChild(document.createElement("div"));
         this.nameDiv.className = "player-data";
+        this.appendChild(this.nameDiv);
         
         // Status
-        this.statusIndicator = this.appendChild(new StatusIndicator());
         this.statusIndicator.className = "player-data";
+        this.appendChild(this.statusIndicator);
         
         // Aliases
-        this.aliasesDiv = this.appendChild(document.createElement("div"));
         this.aliasesDiv.className = "player-data";
+        this.appendChild(this.aliasesDiv);
         
         // Schedule
-        this.scheduleDiv = this.appendChild(document.createElement("div"));
         this.scheduleDiv.className = "player-schedule";
         this.scheduleDiv.appendChild(this.playtimeTable);
     }
 
-    populate(database, serverId, playerId) {
+    populate() {
         // Name
-        const name = database.getPlayerName(playerId);
+        const name = this.database.getPlayerName(this.playerId);
         this.nameDiv.innerHTML = name;
 
         // Status
-        const status = database.getPlayerStatus(serverId, playerId);
+        const status = this.database.getPlayerStatus(this.serverId, this.playerId);
         this.statusIndicator.setStatus(status);
 
         // Aliases
-        const aliases = database.getPlayerAliases(playerId);
+        const aliases = this.database.getPlayerAliases(this.playerId);
         this.aliasesDiv.innerHTML = "";
         for (let i = 0; i < aliases.length; i++) {
             if (i > 0) {
@@ -56,8 +62,11 @@ export class PlayerRow extends HTMLElement {
         }
 
         // Schedule
-        const schedule = database.getPlayerSchedule(serverId, playerId);
-        this.playtimeTable.loadFromSchedule(schedule);
+        if (this.isScheduleVisible()) {
+            const schedule = this.database.getPlayerSchedule(this.serverId, this.playerId);
+            this.playtimeTable.loadFromSchedule(schedule);        
+        }
+
         /*
         let timestamp1 = 0;
         let status1 = Status.OFFLINE;
@@ -83,22 +92,28 @@ export class PlayerRow extends HTMLElement {
 
     // --[ events ]-------------------------------------------------------------
     onRowClicked() {
-        this.toggleScheduleVisibile();
+        this.toggleScheduleVisible();
     }
 
     // --[ helpers ]------------------------------------------------------------
     isScheduleVisible() {
-        const style = window.getComputedStyle(this.scheduleDiv);
-        const display = style.getPropertyValue("display");
-        return display != "none";
+        return this.scheduleDiv.parentNode == this
     }
 
-    toggleScheduleVisibile(visible=null) {
+    toggleScheduleVisible(visible=null) {
         if (visible == null) {
-            this.scheduleDiv.style.display = (this.isScheduleVisible() ? "none" : "block");
+            this.toggleScheduleVisible(!this.isScheduleVisible());
+
+        } else if (visible == true) {
+            if (!this.isScheduleVisible()) {                                
+                this.appendChild(this.scheduleDiv);
+                this.populate();
+            }
 
         } else {
-            this.scheduleDiv.style.display = (visible ? "block" : "none");            
+            if (this.isScheduleVisible()) {
+                this.removeChild(this.scheduleDiv);
+            }
         }
     }
 

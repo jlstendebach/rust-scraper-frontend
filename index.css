@@ -175,7 +175,6 @@ a:hover {
 */
 
 .player-schedule {
-    display: none;
     grid-column: 1 / 4;
     padding-top: 0.25rem;
     padding-bottom: 0.5rem;
