@@ -1,6 +1,11 @@
 :root {
     --header-height: 3rem;
     --scrollbar-width: 0.5rem;
+    --content-padding: 0.5rem;
+    --content-width: 80rem;
+
+    --background-color: #222;
+    --foreground-color: #2a2a2a;
 }
 
 
@@ -15,6 +20,7 @@ html, body {
 }
 
 html {
+    scroll-padding-top: var(--header-height);
     overflow-y: scroll;
 }
 
@@ -33,16 +39,21 @@ header {
     top: 0;
     z-index: 999;
     padding: 0.5rem;
+    margin: 0;
     white-space: nowrap;
     width: 100%;
     height: var(--header-height);
+
 }
 
 content {
     display: grid;
     gap: 1rem;
     grid-auto-rows: min-content;
-    padding: 1.0rem;
+
+    padding: 0.9rem 0 0 0;
+    margin: 0 auto 0 auto;
+    max-width: 80rem;
 }
 
 h1 {
@@ -93,7 +104,7 @@ a:hover {
 
 /* --[ ids ]----------------------------------------------------------------- */
 #top {
-    height: calc(var(--header-height) - 2px);
+    margin-top: calc(var(--header-height) - 2px);
 }
 
 #options {
@@ -101,18 +112,15 @@ a:hover {
     align-items: center;
 
     background-color: #2a2a2a;
-    padding: 0.25rem;
+    padding: var(--content-padding);
     margin: 0;
+    max-width: var(--content-width);
 }
 
 #server-list {
     background-color: #2a2a2a;
-    padding: 0.25rem;  
-    padding-bottom: 0.5rem;  
-}
-
-#server-list > h3 {
-    padding: 0.25rem 0;
+    padding: var(--content-padding);  
+    max-width: var(--content-width);
 }
 
 #servers-container {
@@ -124,7 +132,13 @@ a:hover {
     padding: 0;
     margin: 0;
 
-    width: 100%;
+    max-width: var(--content-width);
+    overflow: hidden;
+}
+
+#servers-container > * {
+    box-sizing: border-box;
+    max-width: var(--content-width);
 }
 
 /* --[ classes ]------------------------------------------------------------- */
@@ -134,7 +148,7 @@ a:hover {
 /***********/
 .server-row {
     background-color: #2a2a2a;
-    padding: 0.25rem;
+    padding: var(--content-padding);
 }
 
 .server-header {
@@ -144,7 +158,7 @@ a:hover {
 
     white-space: nowrap;
 
-    padding: 0.5rem 0 0.65rem 0;
+    padding: 0 0 var(--content-padding) 0;
     margin: 0 0 0.30rem 0;
     border-bottom: 1px solid #888;
 }
