@@ -50,10 +50,11 @@ content {
     display: grid;
     gap: 1rem;
     grid-auto-rows: min-content;
+    grid-template-columns: 1fr;
 
     padding: 0.9rem 0 0 0;
     margin: 0 auto 0 auto;
-    max-width: 80rem;
+    max-width: var(--content-width);
 }
 
 h1 {
@@ -201,6 +202,14 @@ a:hover {
     padding: 0.25rem 0 0.25rem 0;
     padding-right: 2.0rem;
 }
+
+.player-aliases {
+    white-space: wrap;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    text-overflow: ellipsis;
+}
+
 
 /*****************/
 /* playtime view */

@@ -7,8 +7,8 @@ export class PlayerRow extends HTMLElement {
     serverId = null;
     playerId = null;
 
-    nameDiv = document.createElement("div");
     statusIndicator = new StatusIndicator();
+    nameDiv = document.createElement("div");
     aliasesDiv = document.createElement("div");
     scheduleDiv = document.createElement("div");
     playtimeTable = new PlaytimeTable();
@@ -24,17 +24,17 @@ export class PlayerRow extends HTMLElement {
         this.addEventListener("click", function() {
             this.onRowClicked();
         }.bind(this));
+        
+        // Status
+        this.statusIndicator.className = "player-data";
+        this.appendChild(this.statusIndicator);
 
         // Name
         this.nameDiv.className = "player-data";
         this.appendChild(this.nameDiv);
         
-        // Status
-        this.statusIndicator.className = "player-data";
-        this.appendChild(this.statusIndicator);
-        
         // Aliases
-        this.aliasesDiv.className = "player-data";
+        this.aliasesDiv.className = "player-data player-aliases";
         this.appendChild(this.aliasesDiv);
         
         // Schedule
@@ -66,28 +66,6 @@ export class PlayerRow extends HTMLElement {
             const schedule = this.database.getPlayerSchedule(this.serverId, this.playerId);
             this.playtimeTable.loadFromSchedule(schedule);        
         }
-
-        /*
-        let timestamp1 = 0;
-        let status1 = Status.OFFLINE;
-
-        this.scheduleDiv.innerHTML = "";
-
-        for (let i = 0; i < schedule.length; i++) {
-            let timestamp2 = schedule[i].timestamp;
-            let status2 = schedule[i].status;
-
-            if (status2 != status1 && status2 == Status.OFFLINE) {
-                this.addTime(timestamp1, timestamp2);
-            }
-
-            timestamp1 = timestamp2;
-            status1 = status2;
-        }
-        if (timestamp1 > 0 && status1 == Status.ONLINE) {    
-            this.addTime(timestamp1, Math.round((new Date()).getTime() / 1000));
-        }        
-        */
     }
 
     // --[ events ]-------------------------------------------------------------

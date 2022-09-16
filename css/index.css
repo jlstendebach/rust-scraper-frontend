@@ -1,0 +1,23 @@
+content {
+    display: grid;
+    gap: 1rem;
+    grid-auto-rows: min-content;
+    grid-template-columns: 1fr;
+
+    padding: 0.9rem 0 0 0;
+    margin: 0 auto 0 auto;
+    max-width: var(--content-width);
+}
+
+
+/* --[ ids ]----------------------------------------------------------------- */
+#top {
+    margin-top: calc(var(--header-height) - 2px);
+}
+
+
+#server-list {
+    background-color: #2a2a2a;
+    padding: var(--content-padding);  
+    max-width: var(--content-width);
+}

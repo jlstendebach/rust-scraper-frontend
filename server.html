@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Trackinator</title>
+
+        <!-- style ------------------------------------------------------------>
+        <link href="css/server.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <!-- body ------------------------------------------------------------->
+        <header>
+            <h2>Trackinator v1.0.3</h2>
+            <span>[<a href="#top">Top</a>]</span>
+        </header>
+
+        <div id="top"></div>
+
+        <content id="main-content">
+            <div id="options">
+                <label for="online-only-checkbox">Online Only:&nbsp;</label>
+                <input id="online-only-checkbox" type="checkbox" checked>
+            </div> 
+
+            <div id="server-row" class="server-row">
+                <div class="server-header">
+                    <h3 id="server-header">Server Name</h3>
+                    <input id="search-bar" type="text" placeholder="Name search...">
+                </div>
+                <div id="players-div" class="server-players">
+                    <div id="players-header-div" class="player-row bold">
+                        <div class="player-data">Status</div>
+                        <div class="player-data">Name</div>
+                        <div class="player-data">Aliases</div>
+                    </div>
+                </div>
+            </div>
+
+        </content>
+
+
+
+        <!-- js --------------------------------------------------------------->
+        <script type="module">
+            import { ServerApp } from "./js/server-app.js"
+
+            window.addEventListener("load", function() {
+                window.removeEventListener("load", this)
+                let app = new ServerApp();
+                app.start();
+            })
+        </script>
+    </body>
+
+</html>

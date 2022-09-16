@@ -1,45 +1,75 @@
-import { DatabaseEvents, Status } from "./database.js";
+import { Database, Status } from "./database.js"
+import { DatabaseEvents } from "./database-events.js";
 import { PlayerRow } from "./player-row.js";
 
-export class ServerRow extends HTMLElement {
-    database = null;
+export class ServerApp {
+    static UPDATE_TIME = 250;
+
+    database = new Database();
     serverId = null;
 
-    headerDiv = null;
-    header = null;
-    searchBar = null;
-    playersDiv = null;
-    playersHeaderDiv = null;
+    header = document.getElementById("server-header");
+    searchBar = document.getElementById("search-bar");
+    playersDiv = document.getElementById("players-div");
+    playersHeaderDiv = document.getElementById("players-header-div");
     playerRows = {};
 
     statusFilter = null;
     nameFilter = null;
+    shouldRebuild = true;
 
-    constructor(database, serverId) {
-        super();
-        this.database = database;
-        this.serverId = serverId;
 
-        this.id = "server-row-"+serverId;
-        this.classList.add("server-row");
+    constructor() {
+        // Initialize the serverRow
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        this.serverId = urlParams.get("id");
 
-        // Header
-        this.headerDiv = this.appendChild(document.createElement("div"));
-        this.headerDiv.className = "server-header";
-        this.header = this.headerDiv.appendChild(document.createElement("h3"));
-        this.searchBar = this.headerDiv.appendChild(document.createElement("input"));
-        this.searchBar.type = "text";
-        this.searchBar.placeholder = "Name search...";
+        // Add event listeners
+        document
+            .getElementById("online-only-checkbox")
+            .addEventListener(
+                "change", 
+                this.onOnlineOnlyCheckboxChange.bind(this)
+            );
+        
+        this.database.addEventListener(
+            DatabaseEvents.UPDATE, 
+            this.onDatabaseUpdate, 
+            this
+        );        
+
         this.searchBar.addEventListener("input", this.onSearchBarChange.bind(this));
 
-        // Players
-        this.playersDiv = this.appendChild(document.createElement("div"));
-        this.playersDiv.className = "server-players";
-        this.playersHeaderDiv = this.playersDiv.appendChild(document.createElement("div"));
-        this.playersHeaderDiv.className = "player-row bold";
-        this.playersHeaderDiv.innerHTML = "<div class='player-data'>Name</div>";
-        this.playersHeaderDiv.innerHTML += "<div class='player-data'>Status</div>";
-        this.playersHeaderDiv.innerHTML += "<div class='player-data'>Aliases</div>";
+    }    
+
+    start() {
+        this.database.fetchPlayers();
+        this.database.fetchSchedule(this.serverId);
+        this.database.fetchServers();
+        requestAnimationFrame(this.loop.bind(this));
+    }
+
+    loop() {
+        console.log("loop");
+        if (this.shouldRebuild) {
+            console.log("rebuilding");
+            this.rebuild();
+            this.shouldRebuild = false;
+        }
+        setTimeout(function() {
+            requestAnimationFrame(this.loop.bind(this));
+        }.bind(this), ServerApp.UPDATE_TIME);
+    }
+
+    rebuild() {
+        let rebuildTime = new Date().getTime();
+
+        this.setStatusFilter(this.isShowingOnlineOnly() ? Status.ONLINE : null);
+        this.populate();
+        
+        rebuildTime = Math.round(new Date().getTime() - rebuildTime);
+        console.log("App.rebuild():", rebuildTime);
     }
 
     // -------------------------------------------------------------------------
@@ -59,7 +89,7 @@ export class ServerRow extends HTMLElement {
         this.header.innerHTML = name + " (" + playerCount + " online)";
 
         // Players
-        const players = this.database.schedule[this.serverId];   
+        const players = this.database.schedule;   
         if (players != null) {
             let alternateColor = false;
             Object.keys(players)
@@ -111,12 +141,29 @@ export class ServerRow extends HTMLElement {
     }
 
     // --[ events ]-------------------------------------------------------------
-    onSearchBarChange() {
-        this.setNameFilter(this.searchBar.value);
-        this.populate();
+    onDatabaseUpdate(type, event) {
+        console.log("onDatabaseUpdate");
+        this.shouldRebuild = true;
     }
 
+    onOnlineOnlyCheckboxChange(type, event) {
+        console.log("onOnlineOnlyCheckboxChange");
+        this.shouldRebuild = true;
+    }
+
+    onSearchBarChange() {
+        console.log("onSearchBarChange")
+        this.setNameFilter(this.searchBar.value);
+        this.shouldRebuild = true;
+    }
+
+
     // --[ helpers ]------------------------------------------------------------
+    isShowingOnlineOnly() {
+        const checkbox = document.getElementById("online-only-checkbox");
+        return checkbox.checked;
+    }
+
     removeAllPlayerRows() {
         while (this.playersDiv.firstChild) {
             this.playersDiv.removeChild(this.playersDiv.firstChild);
@@ -149,8 +196,6 @@ export class ServerRow extends HTMLElement {
         }
 
         return false;
-    }
+    }    
 
 }
-
-customElements.define("server-row", ServerRow);

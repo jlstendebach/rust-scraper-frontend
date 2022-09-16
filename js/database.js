@@ -1,6 +1,5 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js'
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js"
 import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/release/1.0.0/events/EventEmitter.js";
+import { DatabaseEvents } from './database-events.js';
 
 export class Status {    
     static ONLINE = "online";
@@ -16,66 +15,67 @@ export class Status {
     }
 }
 
-class Node {
-    static all = "/";
-    static backup = "backup";
-    static players = "players";
-    static schedule = "schedule";
-    static servers = "servers";
-}
-
-
-export class DatabaseEvents {
-    static UPDATE = "DatabaseUpdateEvent";
-}
 
 export class Database {
-    app = null;
-    database = null;
+    worker = null;
+
     players = {};
     servers = {};
     schedule = {};
+
     eventEmitter = new EventEmitter();
 
     constructor() {
-        this.app = initializeApp({
-            apiKey: "AIzaSyA1m_X7UoT2f7jU5fbGsH7JtrcTYvE7DSQ",
-            authDomain: "rust-player-tracker.firebaseapp.com",
-            databaseURL: "https://rust-player-tracker-default-rtdb.firebaseio.com",
-            projectId: "rust-player-tracker",
-            storageBucket: "rust-player-tracker.appspot.com",
-            messagingSenderId: "732934760915",
-            appId: "1:732934760915:web:f19a11087e3a433e88a726",
-            measurementId: "G-M1EF9VHR0N"
+        this.worker = new Worker("js/database-worker.js", {type: "module"});
+        this.worker.addEventListener("message", this.onWorkerMessage.bind(this));
+    }
+
+
+    // -------------------------------------------------------------------------
+    fetchPlayers() {
+        this.worker.postMessage({type: DatabaseEvents.UPDATE_PLAYERS});
+    }
+    fetchSchedule(serverId) {
+        this.worker.postMessage({
+            type: DatabaseEvents.UPDATE_SCHEDULE,
+            serverId: serverId
         });
-        this.database = getDatabase(this.app);
-
-        // onValue automatically updates whenever there is a change on the 
-        // Firebase side.
-        onValue(
-            ref(this.database, Node.all), 
-            function(snapshot) {
-                const data = snapshot.val();
-                if (data == null) {
-                    return;
-                }
-
-                if (data.players != null) {
-                    this.players = data.players;
-                }
-                if (data.servers != null) {
-                    this.servers = data.servers;
-                }
-                if (data.schedule != null) {
-                    this.schedule = data.schedule;
-                }
-
-                this.emitEvent(DatabaseEvents.UPDATE, this);
-            }.bind(this)
-        );        
+    }
+    fetchServers() {
+        this.worker.postMessage({type: DatabaseEvents.UPDATE_SERVERS});
     }
 
     // --[ events ]-------------------------------------------------------------
+    onWorkerMessage(message) {
+        const type = message.data.type;
+
+        switch (type) {
+            case DatabaseEvents.UPDATE_PLAYERS:
+                console.log("onWorkerMessage: UPDATE_PLAYERS");
+                this.players = message.data.response;
+                this.emitEvent(type, this);
+                break;
+            
+            case DatabaseEvents.UPDATE_SCHEDULE:
+                console.log("onWorkerMessage: UPDATE_SCHEDULE");
+                this.schedule = message.data.response;                
+                this.emitEvent(type, this);
+                break;
+
+            case DatabaseEvents.UPDATE_SERVERS:
+                console.log("onWorkerMessage: UPDATE_SERVERS");
+                this.servers = message.data.response;
+                this.emitEvent(type, this);
+                break;
+            
+            default:
+                console.log("onWorkerMessage: UNKNOWN")
+                break;
+        }
+
+        this.emitEvent(DatabaseEvents.UPDATE, this);
+    }
+
     addEventListener(type, callback, owner=null) {
         this.eventEmitter.add(type, callback, owner);
     }
@@ -99,14 +99,12 @@ export class Database {
     }
 
     getPlayerCount(serverId, status=null) {
-        // The server must exist
-        const server = this.schedule[serverId];
-        if (server == null) {
-            return Status.UNKNOWN;
+        if (this.schedule == null) {
+            return 0;
         }
 
         let count = 0;
-        Object.keys(server).forEach((playerId) => {
+        Object.keys(this.schedule).forEach((playerId) => {
             if (status == null || this.getPlayerStatus(serverId, playerId) == status) {
                 count++;
             }
@@ -152,12 +150,7 @@ export class Database {
     }
 
     getPlayerSchedule(serverId, playerId) {
-        const serverSchedule = this.schedule[serverId];
-        if (serverSchedule == null) {
-            return [];
-        }
-
-        const playerSchedule = serverSchedule[playerId];
+        const playerSchedule = this.schedule[playerId];
         if (playerSchedule == null) {
             return [];
         }
