@@ -63,7 +63,7 @@ export class PlayerRow extends HTMLElement {
 
         // Schedule
         if (this.isScheduleVisible()) {
-            const schedule = this.database.getPlayerSchedule(this.serverId, this.playerId);
+            const schedule = this.database.getPlayerSchedule(this.playerId);
             this.playtimeTable.loadFromSchedule(schedule);        
         }
     }
