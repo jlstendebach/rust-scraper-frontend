@@ -149,17 +149,17 @@ export class Database {
         return Object.keys(player["aliases"]);
     }
 
-    getPlayerSchedule(serverId, playerId) {
+    getPlayerSchedule(playerId) {
         const playerSchedule = this.schedule[playerId];
         if (playerSchedule == null) {
             return [];
         }
 
         let schedule = [];
-        Object.entries(playerSchedule).forEach(([timestamp, entry]) => {
+        Object.entries(playerSchedule).forEach(([timestamp, status]) => {
             schedule.push({
                 timestamp: timestamp,
-                status: entry["status"]
+                status: status
             });
         });
 
