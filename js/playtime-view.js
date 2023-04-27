@@ -1,4 +1,4 @@
-import { Status } from "./database.js";
+import { Player } from "./player.js";
 
 function seconds(hour, minute, second) {
 	return hour*60*60 + minute*60 + second;
@@ -28,7 +28,7 @@ export class PlaytimeView extends HTMLElement {
     addPlaytime(status, seconds) {
         const div = this.appendChild(document.createElement("div"));
         div.style.width = (100 * seconds / PlaytimeView.SECONDS_PER_DAY)+"%";
-        if (status == Status.ONLINE) {
+        if (status == Player.Status.ONLINE) {
             div.className = "playtime-view-online";  
         } else {
             div.className = "playtime-view-offline";  

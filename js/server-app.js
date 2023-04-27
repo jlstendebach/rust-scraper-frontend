@@ -1,6 +1,7 @@
-import { Database, Status } from "./database.js"
+import { Database } from "./database.js"
 import { DatabaseEvents } from "./database-events.js";
 import { PlayerRow } from "./player-row.js";
+import { Player } from "./player.js";
 
 export class ServerApp {
     static UPDATE_TIME = 250;
@@ -65,7 +66,7 @@ export class ServerApp {
     rebuild() {
         let rebuildTime = new Date().getTime();
 
-        this.setStatusFilter(this.isShowingOnlineOnly() ? Status.ONLINE : null);
+        this.setStatusFilter(this.isShowingOnlineOnly() ? Player.Status.ONLINE : null);
         this.populate();
         
         rebuildTime = Math.round(new Date().getTime() - rebuildTime);
@@ -85,7 +86,7 @@ export class ServerApp {
 
         // Name
         const name = this.database.getServerName(this.serverId);
-        const playerCount = this.database.getPlayerCount(this.serverId, Status.ONLINE);
+        const playerCount = this.database.getPlayerCount(this.serverId, Player.Status.ONLINE);
         this.header.innerHTML = name + " (" + playerCount + " online)";
 
         // Players

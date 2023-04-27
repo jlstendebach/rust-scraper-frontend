@@ -1,5 +1,4 @@
 import { StatusIndicator } from "./status-indicator.js";
-import { Status } from "./database.js"
 import { PlaytimeTable } from "./playtime-table.js";
 
 export class PlayerRow extends HTMLElement {

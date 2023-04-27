@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <title>Test</title>
+
+        <!-- style ------------------------------------------------------------>
+        <link href="test.css" rel="stylesheet">
+        <link href="../css/player-table.css" rel="stylesheet">
+        <link href="../css/status-indicator.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <!-- body ------------------------------------------------------------->
+        <player-table id="player-table"></player-table>
+
+        <!-- js --------------------------------------------------------------->
+        <script type="module">
+            import { PlayerTable } from "../js/player-table.js"
+            import { Player } from "../js/player.js"
+
+            window.addEventListener("load", function() {
+                window.removeEventListener("load", this)
+
+                const table = document.getElementById("player-table");
+                const status = [
+                    Player.Status.ONLINE, 
+                    Player.Status.OFFLINE, 
+                    Player.Status.UNKNOWN,
+                ];
+                for (let i = 0; i < 100; i++) {
+                    if (i == 4) {
+                        table.players.push(
+                            new Player(
+                                101, 
+                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 
+                                [], 
+                                Player.Status.ONLINE
+                            )
+                        );
+                    } else {
+                        table.players.push(new Player(i, "Player"+i, [], status[i%3]));
+                    }
+                }
+                table.rebuild();
+            });
+        </script>
+    </body>
+
+</html>

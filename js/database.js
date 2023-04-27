@@ -1,20 +1,6 @@
 import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/release/1.0.0/events/EventEmitter.js";
 import { DatabaseEvents } from './database-events.js';
-
-export class Status {    
-    static ONLINE = "online";
-    static OFFLINE = "offline";
-    static UNKNOWN = "unknown";
-
-    static opposite(status) {
-        switch (status) {
-            case Status.ONLINE: return Status.OFFLINE;
-            case Status.OFFLINE: return Status.ONLINE;
-            default: Status.UNKNOWN;
-        }
-    }
-}
-
+import { Player } from "./player.js";
 
 export class Database {
     worker = null;
@@ -130,9 +116,9 @@ export class Database {
     getPlayerStatus(serverId, playerId) {
         const player = this.players[playerId];
         if (player == null) {
-            return Status.UNKNOWN;
+            return Player.Status.UNKNOWN;
         }
-        return player["server"] == serverId ? Status.ONLINE : Status.OFFLINE;
+        return player["server"] == serverId ? Player.Status.ONLINE : Player.Status.OFFLINE;
     }
 
     getPlayerAliases(playerId) {
