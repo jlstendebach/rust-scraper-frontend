@@ -1,5 +1,4 @@
-import { Player } from "./data/player.js";
-import { PlayerStatus } from "./data/player-status.js";
+import { PlayerStatus } from "../data/player-status.js";
 import { PlaytimeView } from "./playtime-view.js";
 
 export class PlaytimeTable extends HTMLElement {

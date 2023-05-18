@@ -1,8 +1,4 @@
-import { PlayerStatus } from "./data/player-status.js";
-
-function seconds(hour, minute, second) {
-	return hour*60*60 + minute*60 + second;
-}
+import { PlayerStatus } from "../data/player-status.js";
 
 export class PlaytimeView extends HTMLElement {
     static SECONDS_PER_DAY = 60*60*24;

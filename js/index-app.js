@@ -1,11 +1,9 @@
-import { Database } from "./database.js"
-import { DatabaseEvents } from "./database-events.js";
+import { Database } from "./data/database.js"
+import { DatabaseEvents } from "./data/database-events.js";
 import { PlayerStatus } from "./data/player-status.js";
-import { PlayerTable } from "./player-table.js";
 import { Player } from "./data/player.js";
-import { PlaytimeTable } from "./playtime-table.js";
-
-import { Timer } from "https://jlstendebach.github.io/canvas-engine/release/1.0.0/utils/Timer.js";
+import { PlayerTable } from "./views/player-table.js";
+import { PlaytimeTable } from "./views/playtime-table.js";
 
 
 export class IndexApp {
@@ -179,7 +177,7 @@ export class IndexApp {
         if (schedule != null) {
             let players = Object.keys(schedule);
 
-            this.time("filtering players:", () => {
+            this.time("filtering players", () => {
                 players = players.flatMap((playerId) => {
                     const playerData = this.database.getPlayer(playerId);
                     if (playerData == null) {
@@ -200,7 +198,7 @@ export class IndexApp {
                 })
             });
 
-            this.time("sorting players:", () => {
+            this.time("sorting players", () => {
                 players = players.sort((a, b) => {
                     const nameA = a.name.toUpperCase(); 
                     const nameB = b.name.toUpperCase();
@@ -314,18 +312,15 @@ export class IndexApp {
 
     // --[ dom events ]---------------------------------------------------------
     onOnlineOnlyCheckboxChange() {
-        console.log("onOnlineOnlyCheckboxChange");
         this.statusFilter = this.optionOnlineOnlyCheckbox.checked ? PlayerStatus.ONLINE : null;
         this.isPlayerListValid = false;
     }
 
     onSearchAliasesCheckboxChange() {
-        console.log("onSearchAliasesCheckboxChange");
         this.isPlayerListValid = false;
     }
 
     onPlayerListSearchBarChange() {
-        console.log("onSearchBarChange")
         const searchBarValue = this.playerListSearchBar.value.toUpperCase().trim();
 
         if (searchBarValue.length == 0) {
@@ -343,7 +338,6 @@ export class IndexApp {
     }
 
     onPlayerSelected(player) {
-        console.log(player);
         this.player = player;
         this.isPlayerSheetValid = false;
     }

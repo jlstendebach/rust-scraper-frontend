@@ -1,4 +1,4 @@
-import { PlayerStatus } from "./data/player-status.js"
+import { PlayerStatus } from "../data/player-status.js"
 
 export class StatusIndicator extends HTMLElement {
     statusDot = null;
