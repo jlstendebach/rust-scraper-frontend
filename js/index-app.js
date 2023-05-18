@@ -249,6 +249,7 @@ export class IndexApp {
         } else {
             // Name
             this.playerName.innerHTML = this.player.name; 
+            this.playerName.href = "https://www.battlemetrics.com/players/"+this.player.id;
 
             // Status
             this.playerStatus.setStatus(this.player.status);
