@@ -1,41 +1,94 @@
 <html>
     <head>
-        <title>Trackinator</title>
+        <title>Trackinator - Always Watching</title>
 
-        <!-- style ------------------------------------------------------------>
+        <!-- Style ------------------------------------------------------------>
+        <link href="css/status-indicator.css" rel="stylesheet">
+        <link href="css/player-table.css" rel="stylesheet">
+        <link href="css/playtime-table.css" rel="stylesheet">
         <link href="css/common.css" rel="stylesheet">
         <link href="css/index.css" rel="stylesheet">
     </head>
 
     <body>
-        <!-- body ------------------------------------------------------------->
-        <header>
-            <h2>Trackinator v1.0.3</h2>
-            <span>[<a href="#top">Top</a>]</span>
-        </header>
-
-        <div id="top"></div>
-
-        <content>
-            <div id="server-list">
-                <h3>Servers:</h3>
-                <div id="server-list-content">- Loading...</div>
+        <!-- Body ------------------------------------------------------------->
+        <nav>
+            <div class="nav-items">
+                <div class="nav-header">
+                    <div class="nav-title">Trackinator</div>
+                    <div class="nav-subtitle">Always Watching</div>
+                </div>
+                <div class="nav-item dropdown">
+                    Servers
+                    <div id="server-list" class="dropdown-content">
+                        <div>Loading...</div>
+                    </div>
+                </div>
             </div>
-        </content>
+        </nav>
 
+        <main>
+            <div class="card">
+                <h1 id="server-name">Loading...</h1>
+                <div>Population: <span id="server-population">###</span></div>
+            </div>
+    
+            <div id="player-content">
+                <!-- player list container -->
+                <div id="player-list" class="card">
+                    <!-- search -->
+                    <input id="search-bar" type="text" placeholder="Name search...">
 
+                    <!-- options -->
+                    <div id="player-list-options">
+                        <!-- online only -->
+                        <div class="option-container">
+                            <label for="online-only-checkbox">Online Only</label>
+                            <input id="online-only-checkbox" type="checkbox" checked>
+                        </div>
 
-        <!-- js --------------------------------------------------------------->
+                        <!-- search aliases -->
+                        <div class="option-container">
+                            <label for="search-aliases-checkbox">Search Aliases</label>
+                            <input id="search-aliases-checkbox" type="checkbox" checked>
+                        </div>
+                    </div>
+
+                    <!-- player list -->
+                    <player-table id="player-table"></player-table>
+                </div>
+
+                <!-- player info sheet -->
+                <div id="player-sheet" class="card">
+                    <h3>Player Name:</h3> 
+                    <a id="player-name">Select a player...</a>
+
+                    <h3>Status:</h3> 
+                    <status-indicator id="player-status"></status-indicator>
+
+                    <h3>Aliases:</h3>
+                    <div id="player-aliases">
+                        Aliases will appear here...
+                    </div>
+
+                    <h3>Playtime:</h3>
+                    <playtime-table id="playtime-table"></playtime-table>
+                </div>
+
+                <div></div>
+            </div>
+        </main>
+
+        <!-- JS --------------------------------------------------------------->
         <script type="module">
             import { IndexApp } from "./js/index-app.js"
-            import { PlaytimeView } from "./js/playtime-view.js"
 
             window.addEventListener("load", function() {
                 window.removeEventListener("load", this)
-                let app = new IndexApp();
+                const app = new IndexApp();
                 app.start();
-            })
-        </script>
+            });
+        </script>    
     </body>
 
 </html>

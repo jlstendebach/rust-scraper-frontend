@@ -1,8 +1,4 @@
-import { Status } from "./database.js";
-
-function seconds(hour, minute, second) {
-	return hour*60*60 + minute*60 + second;
-}
+import { PlayerStatus } from "../data/player-status.js";
 
 export class PlaytimeView extends HTMLElement {
     static SECONDS_PER_DAY = 60*60*24;
@@ -28,7 +24,7 @@ export class PlaytimeView extends HTMLElement {
     addPlaytime(status, seconds) {
         const div = this.appendChild(document.createElement("div"));
         div.style.width = (100 * seconds / PlaytimeView.SECONDS_PER_DAY)+"%";
-        if (status == Status.ONLINE) {
+        if (status == PlayerStatus.ONLINE) {
             div.className = "playtime-view-online";  
         } else {
             div.className = "playtime-view-offline";  
@@ -64,7 +60,10 @@ export class PlaytimeView extends HTMLElement {
         const hour = Math.floor(time/(60*60));
         const minute = Math.floor((time - hour*60*60)/60);
         const text = minute >= 10 ? hour+":"+minute : hour+":0"+minute;
-        this.tooltip.style.top = this.offsetTop - tooltipRect.height - 4 + 'px';
+
+        const scrollTop = this.parentElement.parentElement.scrollTop;
+        
+        this.tooltip.style.top = this.offsetTop - tooltipRect.height - 4 -scrollTop + 'px';
         this.tooltip.style.left = Math.round(event.x-tooltipRect.width/2 - 1) + 'px';
         this.tooltip.innerHTML = text;    
     }

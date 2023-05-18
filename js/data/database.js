@@ -1,20 +1,6 @@
 import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/release/1.0.0/events/EventEmitter.js";
 import { DatabaseEvents } from './database-events.js';
-
-export class Status {    
-    static ONLINE = "online";
-    static OFFLINE = "offline";
-    static UNKNOWN = "unknown";
-
-    static opposite(status) {
-        switch (status) {
-            case Status.ONLINE: return Status.OFFLINE;
-            case Status.OFFLINE: return Status.ONLINE;
-            default: Status.UNKNOWN;
-        }
-    }
-}
-
+import { PlayerStatus } from "./player-status.js";
 
 export class Database {
     worker = null;
@@ -26,7 +12,7 @@ export class Database {
     eventEmitter = new EventEmitter();
 
     constructor() {
-        this.worker = new Worker("js/database-worker.js", {type: "module"});
+        this.worker = new Worker("js/data/database-worker.js", {type: "module"});
         this.worker.addEventListener("message", this.onWorkerMessage.bind(this));
     }
 
@@ -42,7 +28,7 @@ export class Database {
         });
     }
     fetchServers() {
-        this.worker.postMessage({type: DatabaseEvents.UPDATE_SERVERS});
+        this.worker.postMessage({type: DatabaseEvents.UPDATE_SERVERS});        
     }
 
     // --[ events ]-------------------------------------------------------------
@@ -51,25 +37,25 @@ export class Database {
 
         switch (type) {
             case DatabaseEvents.UPDATE_PLAYERS:
-                console.log("onWorkerMessage: UPDATE_PLAYERS");
+                // console.log("onWorkerMessage: UPDATE_PLAYERS");
                 this.players = message.data.response;
                 this.emitEvent(type, this);
                 break;
             
             case DatabaseEvents.UPDATE_SCHEDULE:
-                console.log("onWorkerMessage: UPDATE_SCHEDULE");
+                // console.log("onWorkerMessage: UPDATE_SCHEDULE");
                 this.schedule = message.data.response;                
                 this.emitEvent(type, this);
                 break;
 
             case DatabaseEvents.UPDATE_SERVERS:
-                console.log("onWorkerMessage: UPDATE_SERVERS");
+                // console.log("onWorkerMessage: UPDATE_SERVERS");
                 this.servers = message.data.response;
                 this.emitEvent(type, this);
                 break;
             
             default:
-                console.log("onWorkerMessage: UNKNOWN")
+                // console.log("onWorkerMessage: UNKNOWN")
                 break;
         }
 
@@ -130,9 +116,9 @@ export class Database {
     getPlayerStatus(serverId, playerId) {
         const player = this.players[playerId];
         if (player == null) {
-            return Status.UNKNOWN;
+            return PlayerStatus.UNKNOWN;
         }
-        return player["server"] == serverId ? Status.ONLINE : Status.OFFLINE;
+        return player["server"] == serverId ? PlayerStatus.ONLINE : PlayerStatus.OFFLINE;
     }
 
     getPlayerAliases(playerId) {
