@@ -1,24 +1,30 @@
+:root {
+    --status-online-color: lime;
+    --status-offline-color: var(--gray5);
+    --status-unknown-color: red;
+}
+
 .status-indicator {
     display: flex;
     align-items: center;
 }
 
 .status-indicator-dot {
-    height: 0.6rem;
-    width: 0.6rem;
-    min-height: 0.6rem;
-    min-width: 0.6rem;
-    background-color: #bbb;
+    height: 10px;
+    width: 10px;
+    min-height: 10px;
+    min-width: 10px;
+    background-color: var(--status-unknown-color);
     border-radius: 50%;
     display: inline-block;
     margin-right: 5px;
-    border: 1px solid #222;
+    border: 1px solid var(--gray1);
 }
 
 .status-indicator-offline {
-    background-color: red;
+    background-color: var(--status-offline-color);
 }
 
 .status-indicator-online {
-    background-color: lime;
+    background-color: var(--status-online-color);
 }

@@ -1,10 +1,10 @@
-import { Player } from "./player.js"
+import { PlayerStatus } from "./data/player-status.js"
 
 export class StatusIndicator extends HTMLElement {
     statusDot = null;
     statusText = null;
 
-    constructor(status = Player.Status.UNKNOWN) {
+    constructor(status = PlayerStatus.UNKNOWN) {
         super();
         this.className = "status-indicator";
         this.statusDot = this.appendChild(document.createElement("span"));
@@ -14,12 +14,12 @@ export class StatusIndicator extends HTMLElement {
 
     setStatus(status) {
         switch (status) {
-            case Player.Status.ONLINE:
+            case PlayerStatus.ONLINE:
                 this.statusDot.className = "status-indicator-dot status-indicator-online";
                 this.statusText.innerHTML = "Online";
                 break;
 
-            case Player.Status.OFFLINE:
+            case PlayerStatus.OFFLINE:
                 this.statusDot.className = "status-indicator-dot status-indicator-offline";
                 this.statusText.innerHTML = "Offline";
                 break;

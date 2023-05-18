@@ -1,4 +1,5 @@
-import { Player } from "./player.js";
+import { Player } from "./data/player.js";
+import { PlayerStatus } from "./data/player-status.js";
 import { PlaytimeView } from "./playtime-view.js";
 
 export class PlaytimeTable extends HTMLElement {
@@ -38,7 +39,7 @@ export class PlaytimeTable extends HTMLElement {
             let seconds = playtime[i].timestamp2-playtime[i].timestamp1;
             let status = playtime[i].status;
 
-            if (status == Player.Status.ONLINE) {
+            if (status == PlayerStatus.ONLINE) {
                 totalSeconds += seconds
             }
 
@@ -117,7 +118,7 @@ export class PlaytimeTable extends HTMLElement {
         let entries = [];
         
         let lastTimestamp = 0;
-        let lastStatus = Player.Status.UNKNOWN;
+        let lastStatus = PlayerStatus.UNKNOWN;
         
         for (let i = 0; i < schedule.length; i++) {
             const isLast = (i == schedule.length-1);
@@ -130,7 +131,7 @@ export class PlaytimeTable extends HTMLElement {
             if (scheduleDate < startOfDay) {
                 if (isLast) {
                     entries.push({
-                        status: Player.Status.UNKNOWN,
+                        status: PlayerStatus.UNKNOWN,
                         timestamp1: this.dateToSeconds(startOfDay),
                         timestamp2: this.dateToSeconds(endOfDay),
                     });
@@ -176,7 +177,7 @@ export class PlaytimeTable extends HTMLElement {
         
         if (entries.length == 0) {
             entries.push({
-                status: Player.Status.UNKNOWN,
+                status: PlayerStatus.UNKNOWN,
                 timestamp1: this.dateToSeconds(startOfDay),
                 timestamp2: this.dateToSeconds(endOfDay),
             });    

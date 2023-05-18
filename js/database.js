@@ -1,6 +1,7 @@
 import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/release/1.0.0/events/EventEmitter.js";
 import { DatabaseEvents } from './database-events.js';
-import { Player } from "./player.js";
+import { Player } from "./data/player.js";
+import { PlayerStatus } from "./data/player-status.js";
 
 export class Database {
     worker = null;
@@ -37,25 +38,25 @@ export class Database {
 
         switch (type) {
             case DatabaseEvents.UPDATE_PLAYERS:
-                console.log("onWorkerMessage: UPDATE_PLAYERS");
+                //console.log("onWorkerMessage: UPDATE_PLAYERS");
                 this.players = message.data.response;
                 this.emitEvent(type, this);
                 break;
             
             case DatabaseEvents.UPDATE_SCHEDULE:
-                console.log("onWorkerMessage: UPDATE_SCHEDULE");
+                //console.log("onWorkerMessage: UPDATE_SCHEDULE");
                 this.schedule = message.data.response;                
                 this.emitEvent(type, this);
                 break;
 
             case DatabaseEvents.UPDATE_SERVERS:
-                console.log("onWorkerMessage: UPDATE_SERVERS");
+                //console.log("onWorkerMessage: UPDATE_SERVERS");
                 this.servers = message.data.response;
                 this.emitEvent(type, this);
                 break;
             
             default:
-                console.log("onWorkerMessage: UNKNOWN")
+                //console.log("onWorkerMessage: UNKNOWN")
                 break;
         }
 
@@ -116,9 +117,9 @@ export class Database {
     getPlayerStatus(serverId, playerId) {
         const player = this.players[playerId];
         if (player == null) {
-            return Player.Status.UNKNOWN;
+            return PlayerStatus.UNKNOWN;
         }
-        return player["server"] == serverId ? Player.Status.ONLINE : Player.Status.OFFLINE;
+        return player["server"] == serverId ? PlayerStatus.ONLINE : PlayerStatus.OFFLINE;
     }
 
     getPlayerAliases(playerId) {
