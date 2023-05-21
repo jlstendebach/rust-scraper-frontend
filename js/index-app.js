@@ -9,6 +9,8 @@ import { PlaytimeTable } from "./views/playtime-table.js";
 export class IndexApp {
     static UPDATE_TIME = 1000; // milliseconds
 
+    debug = false;
+
     database = new Database();
     serverId = null;
     player = null;
@@ -179,17 +181,27 @@ export class IndexApp {
 
             this.time("filtering players", () => {
                 players = players.flatMap((playerId) => {
-                    const playerData = this.database.getPlayer(playerId);
-                    if (playerData == null) {
+                    const data = this.database.getPlayer(playerId);
+                    if (data == null) {
                         return []; // remove from the list
                     }
 
-                    const playerStatus = this.database.getPlayerStatus(this.serverId, playerId);
-                    if (playerStatus == null) {
+                    const name = data.name;
+                    if (name == null) {
                         return []; // remove from the list
                     }
 
-                    const player = new Player(playerId, playerData.name, playerData.aliases, playerStatus);
+                    let aliases = data.aliases;
+                    if (aliases == null || aliases.length == 0) {
+                        aliases = [name];
+                    }
+
+                    const status = this.database.getPlayerStatus(this.serverId, playerId);
+                    if (status == null) {
+                        return []; // remove from the list
+                    }
+
+                    const player = new Player(playerId, name, aliases, status);
                     if (!this.isShowingPlayer(player)) {
                         return []; // remove from the list
                     }
@@ -225,7 +237,7 @@ export class IndexApp {
 
         let names = [player.name];
         if (this.optionSearchAliasesCheckbox.checked) {
-            names = Object.keys(player.aliases)            
+            names = Object.keys(player.aliases)           
         }
 
         for (let name of names) {
@@ -292,20 +304,20 @@ export class IndexApp {
 
     // --[ network events ]-----------------------------------------------------
     onDatabaseUpdateServers(type, database) {
-        console.log("onDatabaseUpdateServers");
+        // console.log("onDatabaseUpdateServers");
         this.isNavigationValid = false;
         this.isHeaderValid = false;
     }
 
     onDatabaseUpdatePlayers(type, database) {
-        console.log("onDatabaseUpdatePlayers");
+        // console.log("onDatabaseUpdatePlayers");
         this.isHeaderValid = false;
         this.isPlayerListValid = false;
         this.isPlayerSheetValid = false;
     }
  
     onDatabaseUpdateSchedule(type, database) {
-        console.log("onDatabaseUpdateSchedule");
+        // console.log("onDatabaseUpdateSchedule");
         this.isHeaderValid = false;
         this.isPlayerListValid = false;
         this.isPlayerSheetValid = false;
@@ -348,7 +360,9 @@ export class IndexApp {
         let time = new Date().getTime();
         callback();
         time = Math.round(new Date().getTime() - time);
-        console.log(name+":", time);
+        if (this.debug) {
+            console.log(name+":", time);
+        }
     }
 
 
