@@ -15,13 +15,71 @@ export class PlaytimeTable extends HTMLElement {
     }
 
     loadFromSchedule(schedule) {
-        const date1 = this.getDate(schedule[0].timestamp);
-        const date2 = this.getDate(schedule[schedule.length-1].timestamp);
-
         this.removeAllChildren();
 
-        for (let date = date1; date <= date2; date.setDate(date.getDate()+1)) {
-            this.addRow(date, this.getScheduleForDate(schedule, date));
+        // Categorize all of the timestamps by day.
+        let statusesPerDay = {};
+        for (let i = 0; i < schedule.length; i++) {
+            const day = this.getDate(schedule[i].timestamp);
+            if (!statusesPerDay.hasOwnProperty(day)) {
+                statusesPerDay[day] = [];
+            }
+            statusesPerDay[day].push(schedule[i]);
+        }
+
+        // Go through each day, generating a full schedule for that day.
+        const date1 = this.getDate(schedule[0].timestamp);
+        const date2 = new Date(); 
+        let schedulePerDay = {};
+        let currentStatus = PlayerStatus.UNKNOWN;
+
+        for (let day = date1; day <= date2; day.setDate(day.getDate()+1)) {
+            const startTimestamp = this.dateToSeconds(this.getStartOfDay(day));
+            const endTimestamp = this.dateToSeconds(
+                this.isSameDay(day, new Date()) 
+                    ? new Date()
+                    : this.getEndOfDay(day)
+            );
+            const statuses = statusesPerDay[day];
+
+            let daySchedule = [];
+
+            if (statuses == null) {
+                daySchedule.push({
+                    timestamp1: startTimestamp,
+                    timestamp2: endTimestamp,
+                    status: currentStatus
+                });
+
+            } else {
+                daySchedule.push({
+                    timestamp1: startTimestamp,
+                    timestamp2: statuses[0].timestamp,
+                    status: PlayerStatus.opposite(statuses[0].status)
+                });
+                for (let i = 1; i < statuses.length; i++) {
+                    daySchedule.push({
+                        timestamp1: statuses[i-1].timestamp,
+                        timestamp2: statuses[i].timestamp,
+                        status: statuses[i-1].status
+                    });                    
+                }
+                daySchedule.push({
+                    timestamp1: statuses[statuses.length-1].timestamp,
+                    timestamp2: endTimestamp,
+                    status: statuses[statuses.length-1].status
+                });
+
+                currentStatus = statuses[statuses.length-1].status;
+            }
+
+            schedulePerDay[day] = daySchedule;
+        }
+
+        // Generate the rows for each date from the first to today
+        for (let day of Object.keys(schedulePerDay).reverse()) {
+            day = new Date(day);
+            this.addRow(day, schedulePerDay[day]);
         }
     }
 
@@ -76,11 +134,13 @@ export class PlaytimeTable extends HTMLElement {
         );
     }
 
+    // Returns just the date, without taking into account the time.
     getDate(seconds) {
         let temp = this.getDateTime(seconds);
         return new Date(temp.getFullYear(), temp.getMonth(), temp.getDate());
     }
 
+    // Returns the date at a given time.
     getDateTime(seconds) {
         return new Date(seconds*1000);
     }
@@ -111,79 +171,7 @@ export class PlaytimeTable extends HTMLElement {
         return Math.round(date.getTime()/1000);
     }
     
-    getScheduleForDate(schedule, date) {
-        const startOfDay = this.getStartOfDay(date);
-        const endOfDay = this.getEndOfDay(date);
-        let entries = [];
-        
-        let lastTimestamp = 0;
-        let lastStatus = PlayerStatus.UNKNOWN;
-        
-        for (let i = 0; i < schedule.length; i++) {
-            const isLast = (i == schedule.length-1);
-            const isFirstEntry = (entries.length == 0);
-            const isToday = this.isSameDay(date, new Date());
-            let timestamp = schedule[i].timestamp;
-            let status = schedule[i].status;
-            let scheduleDate = this.getDateTime(timestamp);
-            
-            if (scheduleDate < startOfDay) {
-                if (isLast) {
-                    entries.push({
-                        status: PlayerStatus.UNKNOWN,
-                        timestamp1: this.dateToSeconds(startOfDay),
-                        timestamp2: this.dateToSeconds(endOfDay),
-                    });
-                }        
-            
-                lastTimestamp = timestamp;
-                lastStatus = status;
-            
-            } else if (scheduleDate > endOfDay) {
-                entries.push({
-                    timestamp1: isFirstEntry
-                    ? this.dateToSeconds(startOfDay) 
-                    : lastTimestamp,
-                    timestamp2: this.dateToSeconds(endOfDay),
-                    status: lastStatus
-                });
-            
-                break;
-            
-            } else {
-                entries.push({
-                    timestamp1: isFirstEntry 
-                        ? this.dateToSeconds(startOfDay)
-                        : lastTimestamp,
-                    timestamp2: timestamp,
-                    status: lastStatus
-                });            	
 
-                if (isLast) {
-                    entries.push({
-                        timestamp1: timestamp,
-                        timestamp2: isToday 
-                            ? this.dateToSeconds(new Date())
-                            : this.dateToSeconds(endOfDay),
-                        status: status
-                    });            	
-                }
-    
-                lastTimestamp = timestamp;
-                lastStatus = status;            
-            }
-        }
-        
-        if (entries.length == 0) {
-            entries.push({
-                status: PlayerStatus.UNKNOWN,
-                timestamp1: this.dateToSeconds(startOfDay),
-                timestamp2: this.dateToSeconds(endOfDay),
-            });    
-        }
-        
-        return entries;
-    }
 }
 
 customElements.define("playtime-table", PlaytimeTable);
