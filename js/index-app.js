@@ -139,19 +139,31 @@ export class IndexApp {
 
     // --[ update header ]------------------------------------------------------
     updateHeaderServerName() {
-        // Server name
+        // If no server has been selected, prompt the user to select a server.
         if (this.serverId == null) {
             this.serverName.innerHTML = "Select Server ^^^";
             return;
         }
 
+        // If a server has been selected, but we don't have a name yet, we are 
+        // still loading.
         const serverName = this.database.getServerName(this.serverId);
         if (serverName == null) {
             this.serverName.innerHTML = "Loading...";
             return;
         }
 
-        this.serverName.innerHTML = serverName;
+        // We have a server ID and we have a name, so create a link to the 
+        // BattleMetrics page and present the name!
+        const link = document.createElement("a");
+        link.href = "https://www.battlemetrics.com/servers/rust/"+this.serverId;
+        link.innerHTML = serverName;
+
+        while (this.serverName.firstChild) {
+            this.serverName.removeChild(this.serverName.firstChild);
+        }        
+        this.serverName.innerHTML = "";
+        this.serverName.appendChild(link);
     }
 
     updateHeaderServerPop() {
