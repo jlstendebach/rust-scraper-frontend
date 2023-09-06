@@ -1,4 +1,4 @@
-import { EventEmitter } from "https://jlstendebach.github.io/canvas-engine/release/1.0.0/events/EventEmitter.js";
+import { EventEmitter } from "https://cdn.jsdelivr.net/gh/jlstendebach/canvas-engine@v0.1.0/index.js";
 import { DatabaseEvents } from './database-events.js';
 import { PlayerStatus } from "./player-status.js";
 
